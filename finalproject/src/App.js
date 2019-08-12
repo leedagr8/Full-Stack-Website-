@@ -37,17 +37,40 @@ const particlesOptions = {
   }
 }
 
+const initialState = {
+  input: '',
+      imageUrl: '',
+      box: {},
+      route: 'signin',
+      isSignedIn: false,
+      user: {
+        id: '',
+        email: '',
+        name: '',
+        password: '',
+        entries: 0,
+        joined: ''
+      }
+}
 class App extends Component {
 
   constructor() {
     super();
-    this.state = {
-      input: '',
-      imageUrl: '',
-      box: {},
-      route: 'signin',
-      isSignedIn: false
-    };
+    this.state =  initialState;
+  }
+
+  loadUser = (data) => {
+    this.setState({
+      user: {
+        id: data.id,
+        email: data.email,
+        name: data.name,
+        password: data.password,
+        entries: data.entries,
+        joined: data.joined
+      }
+    })
+
   }
 
   onInputChange = (event) => {
@@ -78,21 +101,39 @@ class App extends Component {
       .predict(
         Clarifai.FACE_DETECT_MODEL,
         this.state.input)
-      .then(response => this.displayFaceBox(this.calculateFaceLocation(response)))
+      .then(response => {
+        if (response) {
+          fetch("http://localhost:3001/image", {
+            method: 'put',
+            headers: { 'Content-type': 'application/json' },
+            body: JSON.stringify({
+              id: this.state.user.id
+            })
+          }).catch(console.log)
+          .then(response => response.json())
+          .then(count => {
+            this.setState(Object.assign(this.state.user, {entries: count}))
+          })
+        }
+        this.displayFaceBox(this.calculateFaceLocation(response))
+      })
       .catch(err => console.log(err));
   }
 
   onRouteChange = (route) => {
+
     this.setState({ route: route })
-    if(route === 'home'){
-      this.setState({isSignedIn: true})
-    } else {
-      this.setState({isSignedIn: false})
+
+    if (route === 'home') {
+      this.setState({ isSignedIn: true })
+    } else if(route === 'signout'){
+      this.setState(initialState)
     }
+    
   }
 
   render() {
-   const {isSignedIn, route, box, imageUrl} = this.state;
+    const { isSignedIn, route, box, imageUrl } = this.state;
     return (
       <div className="App">
         <Particles className='particles'
@@ -101,7 +142,7 @@ class App extends Component {
         <Navigation isSignedn={isSignedIn} onRouteChange={this.onRouteChange} />
         {route === 'home'
           ? <div>
-            <Rank />
+            <Rank name={this.state.user.name} entries={this.state.user.entries} />
             <ImageLinkForm
               onInputChange={this.onInputChange}
               onButtonSubmit={this.onButtonSubmit} />
@@ -109,8 +150,8 @@ class App extends Component {
           </div>
           : (
             route === 'signin'
-              ? <SignIn onRouteChange={this.onRouteChange} />
-              : <Register onRouteChange={this.onRouteChange} />
+              ? <SignIn loadUser= {this.loadUser} onRouteChange={this.onRouteChange} />
+              : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
           )
         }
       </div>
