@@ -108,7 +108,9 @@ app.put('/image', (req, res) => {
     //  if (!found) return res.status(400).json('user not found');
 })
 
-app.listen(3001, () => {
+const PORT = process.env.PORT;
+
+app.listen(process.env.PORT || 3001, () => {
     console.log('App is running on port 3001');
 })
 

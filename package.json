@@ -1,7 +1,7 @@
 {
   "name": "FinalProjectApi",
   "version": "1.0.0",
-  "description": "",
+  "description": "Created a full stack website using React and node JS and even used a machine learning api to detect faces.",
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js"
@@ -18,5 +18,13 @@
     "knex": "^0.19.1",
     "nodemon": "^1.19.1",
     "pg": "^7.12.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leedagr8/Full-Stack-Website-.git"
+  },
+  "bugs": {
+    "url": "https://github.com/leedagr8/Full-Stack-Website-/issues"
+  },
+  "homepage": "https://github.com/leedagr8/Full-Stack-Website-#readme"
 }
